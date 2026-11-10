@@ -2,35 +2,49 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Employee Directory</title>
     <style>
         body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 40px; color: #222; }
-        .card { max-width: 1000px; margin: auto; background: #fff; border-radius: 12px; padding: 28px; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+        .card { max-width: 1100px; margin: auto; background: #fff; border-radius: 12px; padding: 28px; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+        .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
         h1 { margin: 0 0 6px; color: #1e3a5f; }
         p.sub { margin: 0 0 20px; color: #666; }
-        form { display: flex; gap: 8px; margin-bottom: 18px; }
+        form.search { display: flex; gap: 8px; margin-bottom: 18px; }
         input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
-        button, a.btn { padding: 10px 16px; border: none; border-radius: 6px; background: #1e3a5f; color: #fff; cursor: pointer; text-decoration: none; }
-        a.btn { background: #888; }
+        button, a.btn { padding: 10px 16px; border: none; border-radius: 6px; background: #1e3a5f; color: #fff; cursor: pointer; text-decoration: none; font-size: 14px; }
+        a.btn.gray { background: #888; }
+        a.btn.green { background: #2e7d32; }
+        .actions { display: flex; gap: 6px; }
+        .actions a, .actions button { padding: 6px 10px; font-size: 13px; }
+        .actions a { background: #f0a500; }
+        .actions button { background: #c62828; }
         table { width: 100%; border-collapse: collapse; }
         th { background: #1e3a5f; color: #fff; text-align: left; padding: 12px; }
         td { padding: 12px; border-bottom: 1px solid #eee; }
         tr:nth-child(even) td { background: #f9fafc; }
         .empty { text-align: center; color: #999; padding: 20px; }
+        .table-wrap { overflow-x: auto; }
     </style>
 </head>
 <body>
 <div class="card">
-    <h1>Corporate Employee Directory</h1>
-    <p class="sub">Showing <span th:text="${total}">0</span> employee(s)</p>
+    <div class="top">
+        <div>
+            <h1>Corporate Employee Directory</h1>
+            <p class="sub">Showing <span th:text="${total}">0</span> employee(s)</p>
+        </div>
+        <a class="btn green" th:href="@{/employees/add}">+ Add Employee</a>
+    </div>
 
     <!-- Search box: sends ?search=word back to the controller -->
-    <form th:action="@{/employees}" method="get">
+    <form class="search" th:action="@{/employees}" method="get">
         <input type="text" name="search" th:value="${search}" placeholder="Search by name or department...">
         <button type="submit">Search</button>
-        <a class="btn" th:href="@{/employees}">Reset</a>
+        <a class="btn gray" th:href="@{/employees}">Reset</a>
     </form>
 
+    <div class="table-wrap">
     <table>
         <thead>
         <tr>
@@ -40,6 +54,7 @@
             <th>Department</th>
             <th>Email</th>
             <th>Phone</th>
+            <th>Actions</th>
         </tr>
         </thead>
         <tbody>
@@ -51,13 +66,23 @@
             <td th:text="${emp.department}">Dept</td>
             <td th:text="${emp.email}">email</td>
             <td th:text="${emp.phone}">phone</td>
+            <td>
+                <div class="actions">
+                    <a class="btn" th:href="@{/employees/edit/{id}(id=${emp.id})}">Edit</a>
+                    <form th:action="@{/employees/delete/{id}(id=${emp.id})}" method="post"
+                          onsubmit="return confirm('Delete this employee?');">
+                        <button type="submit">Delete</button>
+                    </form>
+                </div>
+            </td>
         </tr>
         <!-- th:if shows this row only when there are no results -->
         <tr th:if="${employees.isEmpty()}">
-            <td colspan="6" class="empty">No employees found.</td>
+            <td colspan="7" class="empty">No employees found.</td>
         </tr>
         </tbody>
     </table>
+    </div>
 </div>
 </body>
 </html>
